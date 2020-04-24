@@ -8,18 +8,21 @@ void imprimir(float *output_, int size){
     }
 }
 
-int main() {
-    float b0 = 0.2347009086815551;
-    float b1 = 0.4694018173631102;
-    float b2 = 0.2347009086815551;
 
-    float a1 = -0.1598795087668923;
-    float a2 = 0.09868314349311275;
+float * iir_biquad(
+        float input[], int input_size,
+        float b0, float b1, float b2,
+        float a0, float a1, float a2
+        );
 
-    float a[]= {1, a1, a2};
+float * iir_biquad(float input[], int input_size,
+                   float b0, float b1, float b2,
+                   float a0, float a1, float a2
+)
+{
+    float a[]= {a0, a1, a2};
     float b[]= {b0, b1, b2};
 
-    float input[] = {1, 0, 0, 0, 0, 0};
     float output[] = {0, 0, 0, 0, 0, 0};
     float padding[] = { 0, 0 };
 
@@ -33,8 +36,8 @@ int main() {
     memcpy(output_,     padding, 2 * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
     memcpy(output_ + 2, output, 6 * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
 
-    const int N = 8;
     const int filter_size = 2;
+    const int N = input_size + filter_size;
 
     //y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] – a1*y[n-1] – a2*y[n-2]
     for (int i = 2; i < N; i++) {
@@ -45,6 +48,23 @@ int main() {
         }
         output_[i] =acc;
     }
-    imprimir(output_, 8);
+    return output_;
+    //return memcpy(output, output_, 6 * sizeof(float));;
+}
+
+int main() {
+    float b0 = 0.2347009086815551;
+    float b1 = 0.4694018173631102;
+    float b2 = 0.2347009086815551;
+
+    float a0 = 1;
+    float a1 = -0.1598795087668923;
+    float a2 = 0.09868314349311275;
+
+    float input[] = {1, 0, 0, 0, 0, 0};
+    const int input_size = 6;
+    float *output;
+    output = iir_biquad(input, input_size, b0, b1, b2, a0, a1, a2);
+    imprimir(output, 8);
     return 0;
 }
