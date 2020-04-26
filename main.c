@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+// Un filtro IIR bicuadrático (de segundo orden) en forma directa I tiene la siguiente implementacion
+
 void imprimir(float *output_, int size);
 
 // Para mostrar en pantalla los valores de los arreglos
