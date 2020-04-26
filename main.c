@@ -4,7 +4,7 @@ void imprimir(float *output_, int size);
 void imprimir(float *output_, int size){
     for(int x = 0; x< size; x++)
     {
-        printf("%.6f\n", output_[x]);
+        printf("%.10f\n", output_[x]);
     }
 }
 
@@ -24,7 +24,8 @@ float * iir_biquad(float input[],const int input_size,
     float b[]= {b0, b1, b2};
 
     const int Bquad = 2;
-    float output[6] = {0};
+    float* output = malloc((input_size) * sizeof(float)); // array to hold the result
+    memset(output, 0, input_size*sizeof(float));
     float padding[] = { 0, 0};
 
     float* input_ = malloc((input_size + Bquad) * sizeof(float)); // array to hold the result
@@ -48,10 +49,8 @@ float * iir_biquad(float input[],const int input_size,
         }
         output_[i] =acc;
     }
-
-    float* aa = malloc(input_size * sizeof(float)); // array to hold the result
-    memcpy(aa, output_ + Bquad, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
-    return aa;
+    memcpy(output, output_ + Bquad, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    return output;
 }
 
 int main() {
@@ -63,8 +62,8 @@ int main() {
     float a1 = -0.1598795087668923;
     float a2 = 0.09868314349311275;
 
-    float input[] = {1, 0, 0, 0, 0, 0};
-    const int input_size = 6;
+    float input[] = {1, 0, 0, 0, 0, 0,0,0};
+    const int input_size = 8;
     float *output;
     output = iir_biquad(input, input_size, b0, b1, b2, a0, a1, a2);
     imprimir(output, input_size);
