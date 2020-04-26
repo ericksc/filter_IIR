@@ -33,11 +33,11 @@ float * iir_biquad(float input[],const int input_size,
 
     float* input_ = malloc((input_size + Bquad) * sizeof(float)); // Alocando espacio en memoria para el vector de entrada
 
-    // Contruyendo el vector para mantener la entrada. Inicialmente colocando las condiones iniciales
+    // Construyendo el vector para mantener la entrada. Inicialmente colocando las condiones iniciales
     memcpy(input_, padding, Bquad * sizeof(float));
     memcpy(input_ + Bquad, input, input_size * sizeof(float)); // Contruyendo vector de entrada junto con las condiciones iniciales
 
-    // Contruyendo el vector para mantener la salida temporal tomando en cuenta el espacio para las condiciones iniciales
+    // Construyendo el vector para mantener la salida temporal tomando en cuenta el espacio para las condiciones iniciales
     float* output_ = malloc((input_size + Bquad) * sizeof(float));
 
     float* output = malloc((input_size) * sizeof(float)); // Alocando espacio en memoria para el vector de salida
@@ -67,13 +67,13 @@ float * iir_biquad(float input[],const int input_size,
 }
 
 int main() {
-    float b0 = 0.2347009086815551;
-    float b1 = 0.4694018173631102;
-    float b2 = 0.2347009086815551;
+    float b0 = 0.2513790015131591;
+    float b1 = 0.5027580030263182;
+    float b2 = 0.2513790015131591;
 
     float a0 = 1;
-    float a1 = -0.1598795087668923;
-    float a2 = 0.09868314349311275;
+    float a1 = -0.17124071441396285;
+    float a2 = 0.1767567204665992;
 
     float input[] = {1, 0, 0, 0, 0, 0,0,0};
     const int input_size = sizeof(input) / sizeof(float);
