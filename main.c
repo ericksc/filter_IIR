@@ -1,13 +1,14 @@
 #include <stdio.h>
 
 void imprimir(float *output_, int size);
+
+// Para mostrar en pantalla los valores de los arreglos
 void imprimir(float *output_, int size){
     for(int x = 0; x< size; x++)
     {
         printf("%.10f\n", output_[x]);
     }
 }
-
 
 float * iir_biquad(
         float input[], int input_size,
@@ -20,28 +21,37 @@ float * iir_biquad(float input[],const int input_size,
                    float a0, float a1, float a2
 )
 {
+    // Para construir los arreglos de coeficientes
     float a[]= {a0, a1, a2};
     float b[]= {b0, b1, b2};
 
-    const int Bquad = 2;
-    float* output = malloc((input_size) * sizeof(float)); // array to hold the result
-    memset(output, 0, input_size*sizeof(float));
-    float padding[] = { 0, 0};
+    //Preparando los espacios en memoria que almacenan los calculos
+    const int Bquad = 2; // El tamaño del filtro biquad siempre es 2
+    float padding[] = { 0, 0}; // Arreglo para crear el espacio de condiciones iniciales como 0 flotante
 
-    float* input_ = malloc((input_size + Bquad) * sizeof(float)); // array to hold the result
+    float* input_ = malloc((input_size + Bquad) * sizeof(float)); // Alocando espacio en memoria para el vector de entrada
 
-    memcpy(input_,     padding, Bquad * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
-    memcpy(input_ + Bquad, input, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    // Contruyendo el vector para mantener la entrada. Inicialmente colocando las condiones iniciales
+    memcpy(input_, padding, Bquad * sizeof(float));
+    memcpy(input_ + Bquad, input, input_size * sizeof(float)); // Contruyendo vector de entrada junto con las condiciones iniciales
 
-    float* output_ = malloc((input_size + Bquad) * sizeof(float)); // array to hold the result
+    // Contruyendo el vector para mantener la salida temporal tomando en cuenta el espacio para las condiciones iniciales
+    float* output_ = malloc((input_size + Bquad) * sizeof(float));
 
-    memcpy(output_,     padding, Bquad * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
-    memcpy(output_ + Bquad, output, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    float* output = malloc((input_size) * sizeof(float)); // Alocando espacio en memoria para el vector de salida
+    memset(output, 0, input_size*sizeof(float)); // Definiendo inicialmente el arreglo de salida como 0 flotante
+
+    memcpy(output_, padding, Bquad * sizeof(float)); // Contruyendo el espacio con condiciones inicials
+    memcpy(output_ + Bquad, output, input_size * sizeof(float)); // Finalizando el espacio para el arreglo de salida
+    // Espacio de memoria listos para el calculo
 
     const int N = input_size + Bquad;
 
+    // Sección del algoritmo del flitro
     //y[n] = b0*x[n] + b1*x[n-1] + b2*x[n-2] – a1*y[n-1] – a2*y[n-2]
-    for (int i = 2; i < N; i++) {
+    // Para recordar: los taps o delays estan contenidos en input_ y output_
+    // No se requiere tener variables adiciones (para los y[n-1, y[n-2]] o x[n-1], x[n-2]) que se actualizan en cada paso
+    for (int i = Bquad; i < N; i++) {
         float acc = 0;
         for (int j = Bquad; j>=0; j--)
         {
@@ -49,7 +59,8 @@ float * iir_biquad(float input[],const int input_size,
         }
         output_[i] =acc;
     }
-    memcpy(output, output_ + Bquad, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    // Del arreglo temporal de salida excepto el espacio de las condiciones iniciales
+    memcpy(output, output_ + Bquad, input_size * sizeof(float));
     return output;
 }
 
@@ -63,9 +74,12 @@ int main() {
     float a2 = 0.09868314349311275;
 
     float input[] = {1, 0, 0, 0, 0, 0,0,0};
-    const int input_size = 8;
+    const int input_size = sizeof(input) / sizeof(float);
     float *output;
+
+    // Llamando al flitro iir_biquad. Dados los parametros requeridos
     output = iir_biquad(input, input_size, b0, b1, b2, a0, a1, a2);
+
     imprimir(output, input_size);
     return 0;
 }
