@@ -23,18 +23,19 @@ float * iir_biquad(float input[], int input_size,
     float a[]= {a0, a1, a2};
     float b[]= {b0, b1, b2};
 
+    const int Bquad = 2;
     float output[] = {0, 0, 0, 0, 0, 0};
-    float padding[] = { 0, 0 };
+    float padding[] = { 0, 0};
 
-    float* input_ = malloc(8 * sizeof(float)); // array to hold the result
+    float* input_ = malloc((input_size + Bquad) * sizeof(float)); // array to hold the result
 
-    memcpy(input_,     padding, 2 * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
-    memcpy(input_ + 2, input, 6 * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    memcpy(input_,     padding, Bquad * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
+    memcpy(input_ + Bquad, input, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
 
-    float* output_ = malloc(8 * sizeof(float)); // array to hold the result
+    float* output_ = malloc((input_size + Bquad) * sizeof(float)); // array to hold the result
 
-    memcpy(output_,     padding, 2 * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
-    memcpy(output_ + 2, output, 6 * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+    memcpy(output_,     padding, Bquad * sizeof(float)); // copy 4 floats from x to total[0]...total[3]
+    memcpy(output_ + Bquad, output, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
 
     const int filter_size = 2;
     const int N = input_size + filter_size;
@@ -48,8 +49,14 @@ float * iir_biquad(float input[], int input_size,
         }
         output_[i] =acc;
     }
-    return output_;
-    //return memcpy(output, output_, 6 * sizeof(float));;
+
+    float* aa = malloc(input_size * sizeof(float)); // array to hold the result
+
+    memcpy(aa, output_ + Bquad, input_size * sizeof(float)); // copy 4 floats from y to total[4]...total[7]
+
+
+    return aa;
+
 }
 
 int main() {
@@ -65,6 +72,6 @@ int main() {
     const int input_size = 6;
     float *output;
     output = iir_biquad(input, input_size, b0, b1, b2, a0, a1, a2);
-    imprimir(output, 8);
+    imprimir(output, 6);
     return 0;
 }
